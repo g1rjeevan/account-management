@@ -1,0 +1,7 @@
+version: '2.2'
+services:
+  accountmanagement:
+    image: jeevanrpro/accountmanagement:1.0.0
+    container_name: accountmanagement
+    ports:
+      - 8080:8080
