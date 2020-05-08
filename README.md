@@ -3,10 +3,10 @@ This is a case study; A micro-service develop in spring boot
 
 
 To run the application locally:
-    1. To run Account-Management micro-service rest app using "mvn spring-boot:run".
-    2. To run the corresponding the frontend use 
-        a). npm install 
-        b). ng serve
+1. To run Account-Management micro-service rest app using "mvn spring-boot:run".
+2. To run the corresponding the frontend use 
+    a). npm install 
+    b). ng serve
 
 To run using the docker container, Use below repositories:
 
