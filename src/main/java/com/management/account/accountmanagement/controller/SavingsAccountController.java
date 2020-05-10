@@ -23,7 +23,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 
 @Api(tags = "Savings Account API")
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET,RequestMethod.POST,RequestMethod.DELETE})
+@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE})
 @RestController
 @RequestMapping(value = "/api/v1/savings")
 public class SavingsAccountController {
@@ -44,21 +44,23 @@ public class SavingsAccountController {
     }
 
     @ApiOperation(value = "Creates a savings account. Returns savings account object on successful save.")
-    @ApiResponses(value = { @ApiResponse(code = SC_OK, message = "ok"),
+    @ApiResponses(value = {@ApiResponse(code = SC_OK, message = "ok"),
             @ApiResponse(code = SC_BAD_REQUEST, message = "An unexpected error occurred")
     })
     @RequestMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public SavingsAccount addSavingsAccount(@Valid @RequestBody SavingsAccount savingsAccount) throws Exception {
-        return savingsAccountRepository.save(savingsAccount);
+        final SavingsAccount savingsAcc = savingsAccountRepository.save(savingsAccount);
+        LOGGER.info("Savings Account has been created successfully.");
+        return savingsAcc;
     }
 
     @ApiOperation(value = "Get the balance of the savings account for the given account number.")
-    @ApiResponses(value = { @ApiResponse(code = SC_OK, message = "ok"),
+    @ApiResponses(value = {@ApiResponse(code = SC_OK, message = "ok"),
             @ApiResponse(code = SC_BAD_REQUEST, message = "An unexpected error occurred")
     })
-    @RequestMapping(value = "/{accountNumber}",produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
+    @RequestMapping(value = "/{accountNumber}", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     @Transactional
     @ResponseBody
     public Map<String, Object> getBalanceOfSavingsAccount(@PathVariable Long accountNumber) throws Exception {
@@ -66,7 +68,7 @@ public class SavingsAccountController {
     }
 
     @ApiOperation(value = "Deletes a savings account for the given account number,subsequent transactions. Returns successful upon completion.")
-    @ApiResponses(value = { @ApiResponse(code = SC_OK, message = "ok"),
+    @ApiResponses(value = {@ApiResponse(code = SC_OK, message = "ok"),
             @ApiResponse(code = SC_BAD_REQUEST, message = "An unexpected error occurred")
     })
     @RequestMapping(value = "/{accountNumber}", method = RequestMethod.DELETE)

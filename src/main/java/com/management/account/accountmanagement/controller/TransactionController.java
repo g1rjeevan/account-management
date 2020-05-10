@@ -47,18 +47,20 @@ public class TransactionController {
     }
 
     @ApiOperation(value = "Returns the latest 10 transaction of the savings account for the given account number.")
-    @ApiResponses(value = { @ApiResponse(code = SC_OK, message = "ok"),
+    @ApiResponses(value = {@ApiResponse(code = SC_OK, message = "ok"),
             @ApiResponse(code = SC_BAD_REQUEST, message = "An unexpected error occurred")
     })
     @RequestMapping(value = "/latest/{accountNumber}", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public List<Transaction> getLatestTransactionOfTheAccount(@PathVariable Long accountNumber) throws Exception {
-        return transactionService.getLatestTransactionOfTheAccount(accountNumber);
+        final List<Transaction> transactions = transactionService.getLatestTransactionOfTheAccount(accountNumber);
+        LOGGER.info("Latest 10 transactions of the Savings Account has been fetched.");
+        return transactions;
     }
 
     @ApiOperation(value = "Used for amount withdraw and deposit using this api by specifying the {transaction_type}, in request body with amount and accountNumber.")
-    @ApiResponses(value = { @ApiResponse(code = SC_OK, message = "ok"),
+    @ApiResponses(value = {@ApiResponse(code = SC_OK, message = "ok"),
             @ApiResponse(code = SC_BAD_REQUEST, message = "An unexpected error occurred")
     })
     @RequestMapping(value = "/{transaction_type}", consumes = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
@@ -66,7 +68,7 @@ public class TransactionController {
     @ResponseStatus(value = HttpStatus.OK)
     @ResponseBody
     public Transaction addSavingsAccount(@PathVariable("transaction_type") String transaction_type,
-                                         @RequestBody Map<String, Object> transactionRequestBody) throws AccountManagementInvalidTransactionException, AccountManagementResourceNotFound{
+                                         @RequestBody Map<String, Object> transactionRequestBody) throws AccountManagementInvalidTransactionException, AccountManagementResourceNotFound {
 
         Transaction transaction = null;
         final BigDecimal amount = new BigDecimal(transactionRequestBody.get("amount").toString());
@@ -75,7 +77,10 @@ public class TransactionController {
             transaction = transactionService.getDepositTransaction(amount, accountNumber);
         } else if (transaction_type.equalsIgnoreCase(TransactionType.WITHDRAW.name())) {
             transaction = transactionService.getWithdrawTransaction(amount, accountNumber);
+        } else {
+            throw new AccountManagementResourceNotFound("Transaction of " + transaction_type, "savings account.");
         }
+        LOGGER.info("Transaction of type " + transaction_type + " of the savings account has been successful.");
         return transaction;
     }
 }

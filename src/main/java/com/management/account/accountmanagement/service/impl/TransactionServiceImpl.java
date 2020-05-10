@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class TransactionServiceImpl implements TransactionService {
@@ -28,42 +29,30 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public Transaction getDepositTransaction(final BigDecimal amount, final Long savingsAccountId) throws AccountManagementResourceNotFound {
-        final SavingsAccount savingsAccount;
-        LOGGER.info("Coming here");
-
-        try {
-            savingsAccount = savingsAccountRepository.getSavingsAccount(savingsAccountId);
-        } catch (Exception ex) {
-            LOGGER.info("Coming here");
-                throw new AccountManagementResourceNotFound("Savings Account",  savingsAccountId.toString());
+        final SavingsAccount savingsAccount = savingsAccountRepository.getSavingsAccount(savingsAccountId);
+        if (Objects.isNull(savingsAccount)) {
+            throw new AccountManagementResourceNotFound("Savings Account", savingsAccountId.toString());
         }
-        LOGGER.info("Coming here"+savingsAccount.toString());
-
-            Transaction transaction = new Transaction();
-            transaction.setAmount(amount.doubleValue());
-            transaction.setType(TransactionType.DEPOSIT.name());
-            transaction.setSavingsAccount(savingsAccount);
-            transaction.setAvailableBalance(savingsAccount.getBalanceAmount().add(new BigDecimal(transaction.getAmount())));
-            savingsAccountRepository.updateSavingsAccount(transaction.getAvailableBalance(), savingsAccountId);
-            transaction = transactionRepostiory.save(transaction);
-            return transaction;
-
+        final Transaction transaction = new Transaction();
+        transaction.setAmount(amount.doubleValue());
+        transaction.setType(TransactionType.DEPOSIT.name());
+        transaction.setSavingsAccount(savingsAccount);
+        transaction.setAvailableBalance(savingsAccount.getBalanceAmount().add(new BigDecimal(transaction.getAmount())));
+        savingsAccountRepository.updateSavingsAccount(transaction.getAvailableBalance(), savingsAccountId);
+        return transactionRepostiory.save(transaction);
     }
 
     @Override
-    public Transaction getWithdrawTransaction(final BigDecimal amount, final Long savingsAccountId) throws AccountManagementInvalidTransactionException, AccountManagementResourceNotFound  {
-        final SavingsAccount savingsAccount;
-        try {
-            savingsAccount = savingsAccountRepository.getSavingsAccount(savingsAccountId);
-        } catch (Exception ex) {
+    public Transaction getWithdrawTransaction(final BigDecimal amount, final Long savingsAccountId) throws AccountManagementInvalidTransactionException, AccountManagementResourceNotFound {
+        final SavingsAccount savingsAccount = savingsAccountRepository.getSavingsAccount(savingsAccountId);
+        if (Objects.isNull(savingsAccount)) {
             throw new AccountManagementResourceNotFound("Savings Account", savingsAccountId.toString());
-
         }
         final Transaction transaction = new Transaction();
         transaction.setAmount(amount.doubleValue());
         transaction.setType(TransactionType.WITHDRAW.name());
         transaction.setSavingsAccount(savingsAccount);
-        BigDecimal diffAmount = savingsAccount.getBalanceAmount().subtract(new BigDecimal(transaction.getAmount()));
+        final BigDecimal diffAmount = savingsAccount.getBalanceAmount().subtract(new BigDecimal(transaction.getAmount()));
         if (diffAmount.doubleValue() >= 0) {
             transaction.setAvailableBalance(diffAmount);
         } else {
@@ -71,7 +60,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
         savingsAccountRepository.updateSavingsAccount(transaction.getAvailableBalance(), savingsAccountId);
         return transactionRepostiory.save(transaction);
-
     }
 
     @Override
@@ -81,7 +69,7 @@ public class TransactionServiceImpl implements TransactionService {
             savingsAccount = savingsAccountRepository.getSavingsAccount(savingAccountNumber);
             return transactionRepostiory.getLatestTenTransactions(savingsAccount.getId());
         } catch (Exception ex) {
-            throw new AccountManagementResourceNotFound("Savings Account",  savingAccountNumber.toString());
+            throw new AccountManagementResourceNotFound("Savings Account", savingAccountNumber.toString());
 
         }
     }

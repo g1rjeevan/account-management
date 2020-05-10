@@ -3,14 +3,11 @@ package com.management.account.accountmanagement;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.management.account.accountmanagement.model.SavingsAccount;
 import com.management.account.accountmanagement.model.Transaction;
-import org.json.JSONObject;
-import org.junit.FixMethodOrder;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestMethodOrder;
 import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,10 +16,11 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.ByteArrayOutputStream;
-import java.io.OutputStream;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -31,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@SpringBootTest(webEnvironment= SpringBootTest.WebEnvironment.MOCK, classes={ AccountManagementApplication.class })
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = {AccountManagementApplication.class})
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class AccountManagementApplicationTests {
 
@@ -62,11 +60,11 @@ class AccountManagementApplicationTests {
     @Test
     @Order(3)
     public void withdrawTransaction() throws Exception {
-        for(int i=0;i<3;i++){
+        for (int i = 0; i < 3; i++) {
             mvc.perform(post("/api/v1/transaction/withdraw").contentType(MediaType.APPLICATION_JSON)
                     .content(asJsonString(getWithdrawTransaction())).accept(MediaType.APPLICATION_JSON))
                     .andDo(print())
-                    .andExpect(i!=2?status().isOk():status().is4xxClientError());
+                    .andExpect(i != 2 ? status().isOk() : status().is4xxClientError());
         }
     }
 
@@ -102,7 +100,7 @@ class AccountManagementApplicationTests {
     @Test
     @Order(7)
     public void getLatestTenTransaction() throws Exception {
-        for(int i=0;i<20;i++){
+        for (int i = 0; i < 20; i++) {
             getDepositTransaction();
             getWithdrawTransaction();
         }
@@ -111,7 +109,7 @@ class AccountManagementApplicationTests {
                 .andDo(mvcResult -> {
                     MockHttpServletResponse mockHttpServletResponse = mvcResult.getResponse();
                     List<Transaction> transactions = Arrays.asList(new ObjectMapper().readValue(mockHttpServletResponse.getContentAsByteArray(), Transaction[].class));
-                    if(transactions.size()<=10){
+                    if (transactions.size() <= 10) {
                         System.out.println("Latest transactions less than 10::");
                     }
                 })

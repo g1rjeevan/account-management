@@ -2,15 +2,16 @@ package com.management.account.accountmanagement.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import org.hibernate.validator.constraints.CreditCardNumber;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.Range;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import javax.persistence.*;
-import javax.validation.constraints.*;
+import javax.validation.constraints.DecimalMin;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Pattern;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -45,8 +46,8 @@ public class SavingsAccount implements Serializable {
 
     @Column(name = "AADHAR_ID", nullable = false, unique = true)
     @NotBlank(message = "aadharId is mandatory")
-    @Length(max = 10,min = 10)
-    @Pattern(regexp="(^$|[0-9]{10})")
+    @Length(max = 10, min = 10)
+    @Pattern(regexp = "(^$|[0-9]{10})")
     private String aadharId;
 
     @Column(name = "BALANCE_AMOUNT", nullable = false)
